@@ -1,0 +1,50 @@
+{% extends 'base_accounts.html' %}
+{% from 'components/macro_form_errors.html' import form_field_errors %}
+{% from 'components/macro_form_messages.html' import render_flashes %}
+
+{% block content %}
+    <div class="wrapper">
+    <section class="login-content">
+         <div class="container h-100">
+            <div class="row align-items-center justify-content-center h-100">
+               <div class="col-md-5">
+                  <div class="card p-3">
+                     <div class="card-body">
+                        <div class="auth-logo">
+                           <img src="/resources/static/picture/weibo.png" class="img-fluid rounded-normal light-logo" alt="logo">
+                        </div>
+                        <h3 class="mb-3 font-weight-bold text-center">登录</h3>
+                        <p class="text-center text-secondary mb-4">登录你的账号以继续</p>
+                        <form method="POST" action="{{ url_for('accounts.login') }}">
+                           {{ form.csrf_token }}
+                           <div class="row">
+                              <div class="col-lg-12">
+                                 <div class="form-group">
+                                    {{ form.email.label }}
+                                    {{ form.email }}
+                                 </div>
+                                 {# 错误信息 #}
+                                 {{ form_field_errors(form.email.errors) }}
+                              </div>
+                              <div class="col-lg-12 mt-2">
+                                 <div class="form-group">
+                                    {{ form.password.label }}
+                                    {{ form.password }}
+                                 </div>
+                                 {# 错误信息 #}
+                                 {{ render_flashes() }}
+                              </div>
+                           </div>
+                           {{ form.submit }}
+                           <div class="col-lg-12 mt-3">
+                                <p class="mb-0 text-center">没有账号? <a href="{{ url_for('accounts.register') }}">注册</a></p>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+      </div>
+{% endblock %}

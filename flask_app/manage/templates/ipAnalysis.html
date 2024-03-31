@@ -1,0 +1,105 @@
+{% extends 'base_manage.html' %}
+
+{% block content %}
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-12 mb-4 mt-1">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <h4 class="font-weight-bold">IP分析页</h4>
+            </div>
+        </div>
+
+        {# ip分析 #}
+        <div class="col-lg-12 col-md-12">
+         <div class="card card-block card-stretch card-height">
+            <div class="card-header d-flex justify-content-between">
+               <div class="header-title">
+                  <h5 class="card-title"></h5>
+               </div>
+            </div>
+            <div class="card-body p-0">
+               <div id="main" style="width: 100%; height: 750px;">
+                   {# 地图 #}
+               </div>
+            </div>
+         </div>
+      </div>
+	</div>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block chart %}
+
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+<script>
+
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    $.get('../../resources/static/js/china.json', function (geoJson) {
+      echarts.registerMap('HK', geoJson);
+      myChart.setOption(
+        (option = {
+            backgroundColor: '#FFFFFF',
+            title: {
+                text: '中国地区ip分析',
+                x:'center'
+            },
+            tooltip: {
+                trigger: 'item',
+            },
+            toolbox: {
+                show: true,
+                orient: 'vertical',
+                left: 'right',
+                top: 'center',
+            feature: {
+              dataView: { readOnly: false },
+              restore: {},
+              saveAsImage: {}
+            }
+            },
+            visualMap: {
+                min: 50,
+                max: 600,
+                text: ['High', 'Low'],
+                realtime: false,
+                calculable: true,
+                inRange: {
+                  color: ['lightskyblue', 'lightgreen', 'yellow', 'gold', 'orange', 'orangered', 'darkred']
+                }
+            },
+            series: [
+            {
+              name: '浏览量',
+              type: 'map',
+              //血坑，在服务器运行不能用china，解决方案：使用china.json，此处map值用HK
+              map: 'HK',
+              label: {
+                show: true
+              },
+              data:[
+                 {% for name, value in counts_region.items() %}
+                    {name: '{{ name }}', value: {{ value }}},
+                 {% endfor %}
+             ],
+
+            }
+            ]
+        })
+      );
+    });
+
+    option && myChart.setOption(option);
+
+
+
+</script>
+
+{% endblock %}

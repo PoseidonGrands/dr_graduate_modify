@@ -1,0 +1,274 @@
+{% extends 'base_manage.html' %}
+
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-md-12 mb-4 mt-1">
+            <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <h4 class="font-weight-bold">文章分析页</h4>
+            </div>
+        </div>
+
+        {# 文章类型选择 #}
+        <div class="col-lg-12" style="padding-left:0px">
+            <div class="card card-block card-stretch card-height">
+                <div class="card-header card-header-border d-flex justify-content-between">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>
+                                文章类型选择
+                            </label>
+                            <select onchange="articleTypeChange(event)" name="" class="form-control">
+
+                                {# 访问全部文章类型，查看哪个文章类型是已经被选中的，选中的文章类型添加上selected属性以展示 #}
+                                {% for article_type in articles_type %}
+                                    {% if selected_article_type == article_type['name'] %}
+                                        <option selected value="{{ article_type['name'] }}">{{ article_type['name'] }}</option>
+                                    {% else %}
+                                        <option value="{{ article_type['name'] }}">{{ article_type['name'] }}</option>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </select>
+
+                            <script>
+                                  function articleTypeChange(e){
+                                    //获取触发了事件的对象上的value值（选择的option
+                                    window.location.href = 'http://127.0.0.1:8001/articleAnalysis/5?articleType=' + e.target.value
+                                  }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        {# 文章点赞量分析 #}
+        <div class="col-lg-6 col-md-6">
+             <div class="card card-block card-stretch card-height">
+                <div class="card-header d-flex justify-content-between">
+                   <div class="header-title">
+                      <h5 class="card-title">"{{ selected_article_type }}"类型文章点赞量分析</h5>
+                   </div>
+                   <div class="card-header-toolbar d-flex align-items-center">
+                      <div class="dropdown">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-event">
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                     </svg>
+                                     Edit
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                     </svg>
+                                     View
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                     </svg>
+                                     Delete
+                               </a>
+                            </div>
+                         </div>
+                   </div>
+                </div>
+                <div class="card-body p-0">
+                   <div id="main_one" style="width: 100%; height: 350px;"></div>
+                </div>
+             </div>
+          </div>
+
+        {# 文章评论量分析 #}
+        <div class="col-lg-6 col-md-6">
+         <div class="card card-block card-stretch card-height">
+            <div class="card-header d-flex justify-content-between">
+               <div class="header-title">
+                  <h5 class="card-title">"{{ selected_article_type }}"类型文章评论量分析</h5>
+               </div>
+               <div class="card-header-toolbar d-flex align-items-center">
+                  <div class="dropdown">
+
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-event">
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                 </svg>
+                                 Edit
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                 </svg>
+                                 View
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                 </svg>
+                                 Delete
+                           </a>
+                        </div>
+                     </div>
+               </div>
+            </div>
+            <div class="card-body p-0">
+               <div id="main_two" style="width: 100%; height: 350px;"></div>
+            </div>
+         </div>
+      </div>
+
+        {# 文章转发量分析 #}
+        <div class="col-lg-12 col-md-12">
+         <div class="card card-block card-stretch card-height">
+            <div class="card-header d-flex justify-content-between">
+               <div class="header-title">
+                  <h5 class="card-title">"{{ selected_article_type }}"类型文章转发量分析</h5>
+               </div>
+            </div>
+            <div class="card-body p-0">
+               <div id="main_three" style="width: 100%; height: 350px;"></div>
+            </div>
+         </div>
+      </div>
+
+    </div>
+
+
+
+</div>
+
+{% endblock %}
+
+
+{% block chart %}
+<script>
+    var chartDom = document.getElementById('main_one');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      xAxis: {
+        type: 'category',
+        data: {{ scope_like_label|tojson() }},
+        axisLabel: { rotate: 35 }
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          data: {{ counts_like }},
+          type: 'bar',
+          label: {
+            show: false,  // 默认不显示数据标签
+            position: 'top'  // 标签位置设为顶部
+          },
+          emphasis: {
+            label: {
+              show: true  // 鼠标悬浮时显示数据标签
+            }
+          }
+        }
+      ]
+    };
+
+    option && myChart.setOption(option);
+
+
+</script>
+
+<script>
+    var chartDom = document.getElementById('main_two');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      xAxis: {
+        type: 'category',
+        data: {{ scope_comment_label|tojson() }},
+        axisLabel: { rotate: 35 }
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          data: {{ counts_comment }},
+          type: 'bar',
+          label: {
+            show: false,  // 默认不显示数据标签
+            position: 'top'  // 标签位置设为顶部
+          },
+          emphasis: {
+            label: {
+              show: true  // 鼠标悬浮时显示数据标签
+            }
+          }
+        }
+      ]
+    };
+
+    option && myChart.setOption(option);
+
+
+</script>
+
+<script>
+    var chartDom = document.getElementById('main_three');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      xAxis: {
+        type: 'value',
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      },
+      yAxis: {
+        type: 'category',
+        data: {{ scope_repost_label|tojson() }}
+      },
+      dataZoom: [
+        {
+          show: true,
+          start: 0,
+          end: 100
+        },
+        {
+          type: 'inside',
+          start: 0,
+          end: 100
+        },
+        {
+          start: 0,
+          end: 40,
+          show: true,
+          yAxisIndex: 0,
+          filterMode: 'empty',
+          width: 30,
+          height: '80%',
+          showDataShadow: false,
+          left: '93%'
+        }
+      ],
+      series: [
+        {
+          data: {{ counts_repost }},
+          type: 'bar'
+        }
+      ]
+    };
+
+    option && myChart.setOption(option);
+
+
+</script>
+
+{% endblock %}

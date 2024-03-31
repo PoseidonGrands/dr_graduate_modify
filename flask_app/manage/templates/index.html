@@ -1,0 +1,705 @@
+{% extends 'base_manage.html' %}
+
+{% block content %}
+    <div class="container-fluid">
+   <div class="row">
+      {# 汇总数据展示 #}
+      <div class="col-md-12 mb-4 mt-1">
+         <div class="d-flex flex-wrap justify-content-between align-items-center">
+             <h4 class="font-weight-bold">首页</h4>
+             <div class="container">
+                <div class="row justify-content-end">
+                    <div class="col-auto">
+                        <label for="weibo-link" class="col-form-label">请输入微博链接:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="text" id="weibo-link" name="weibo-link" class="form-control" placeholder="" style="width:400px">
+                    </div>
+                    <div class="col-auto">
+                        <button onclick="submitWeiboLink()" class="btn btn-primary">开始分析</button>
+                        <span>------</span>
+                        <button onclick="showAllData()" class="btn btn-primary" style="background-color: orange">分析全部数据</button>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+
+       <script>
+            function submitWeiboLink() {
+                var weiboLink = document.getElementById("weibo-link").value;
+                // 提交到视图函数进行处理
+                window.location.href = 'http://127.0.0.1:8001/0?url=' + weiboLink
+            }
+
+            function showAllData() {
+                window.location.href = 'http://127.0.0.1:8001/0?getAllData=True'
+            }
+       </script>
+
+      {# 总微博个数 #}
+      <div class="col-lg-8 col-md-12">
+         <div class="row">
+            <div class="col-md-4">
+               <div class="card">
+                  <div class="card-body">
+                     <div class="d-flex align-items-center">
+                        <div class="">
+                            {% if is_get_url == 1 %}
+                                <p class="mb-2 text-secondary">总评论个数</p>
+                            {% else %}
+                                <p class="mb-2 text-secondary">总微博个数</p>
+                            {% endif %}
+                            <div class="d-flex flex-wrap justify-content-start align-items-center">
+                               <h5 class="mb-0 font-weight-bold">{{ article_count }}</h5>
+<!--                               <p class="mb-0 ml-3 text-success font-weight-bold">+3.55%</p>-->
+                            </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            {# 最高点赞数 #}
+            <div class="col-md-4">
+                <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                            <p class="mb-2 text-secondary">最高点赞数</p>
+                            <div class="d-flex flex-wrap justify-content-start align-items-center">
+                               <h5 class="mb-0 font-weight-bold">{{ like_count_max }}</h5>
+<!--                               <p class="mb-0 ml-3 text-success font-weight-bold">+2.67%</p>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            {# 最高点赞作者 #}
+            <div class="col-md-4">
+                <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                           <p class="mb-2 text-secondary">最高点赞作者</p>
+                           <div class="d-flex flex-wrap justify-content-start align-items-center">
+<!--                               超出一行则隐藏剩余部分-->
+<!--                              <h5 class="mb-0 font-weight-bold" style="width: 100px; overflow: hidden;text-overflow: ellipsis;white-space: nowrap;" >{{ like_count_max_author }}</h5>-->
+                              <h5 class="mb-0 font-weight-bold" style="width: 100px; text-overflow: ellipsis;">{{ like_count_max_author }}</h5>
+<!--                              <p class="mb-0 ml-3 text-danger font-weight-bold">-9.98%</p>-->
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            {# 评论最多城市 #}
+            <div class="col-md-4">
+                <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="">
+                           <p class="mb-2 text-secondary">评论最多城市</p>
+                           <div class="d-flex flex-wrap justify-content-start align-items-center">
+                              <h5 class="mb-0 font-weight-bold">{{ citys_count[0][0] }}</h5>
+<!--                              <p class="mb-0 ml-3 text-danger font-weight-bold">-9.98%</p>-->
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            {# 微博发布时间个数 #}
+            <div class="col-md-12">
+                <div class="card">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center flex-wrap">
+                        {% if is_get_url == 1 %}
+                            <h4 class="font-weight-bold">评论发布时间个数</h4>
+                        {% else %}
+                            <h4 class="font-weight-bold">微博发布时间个数</h4>
+                        {% endif %}
+                  </div>
+                   <div id="main" style="width: 100%; height: 342px;" class="custom-chart"></div>
+                </div>
+            </div>
+            </div>
+         </div>
+      </div>
+
+      {# 微博点赞数排序 #}
+      <div class="col-lg-4 col-md-8" style="padding-left:0px">
+         <div class="card card-block card-stretch card-height">
+            <div class="card-header card-header-border d-flex justify-content-between">
+               <div class="header-title">
+                   {% if is_get_url == 1 %}
+                        <h4 class="card-title">评论点赞数排序</h4>
+                   {% else %}
+                        <h4 class="card-title">微博点赞数排序</h4>
+                   {% endif %}
+               </div>
+            </div>
+            <div class="card-body-list">
+               <ul class="list-style-3 mb-0">
+                    {% if is_get_url == 1 %}
+                        {% for i in range(0, 4)  %}
+                            <li class="p-3 list-item d-flex justify-content-start align-items-center" style="padding-right: 14px!important">
+                            <div class="avatar">
+                               <p>
+                                  👤 {{ comments_like_count[i][6] }}
+                               </p>
+                               <p class="mb-0" style="color: #ccc;width: 256px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;font-size: 14px;">
+                                   <a href="#" style="color: #ccc;">{{ comments_like_count[i][2] }}</a>
+                               </p>
+                            </div>
+                    <!--                        <div class="list-style-detail ml-3 mr-2">-->
+                    <!--                           -->
+                    <!--                        </div>-->
+                            <div class="list-style-action d-flex justify-content-end ml-auto">
+                               <h6 class="font-weight-bold text-danger">👍{{ comments_like_count[i][3] }}</h6>
+                            </div>
+                         </li>
+                        {% endfor %}
+                    {% else %}
+                        {% for i in range(0, 4)  %}
+                            <li class="p-3 list-item d-flex justify-content-start align-items-center" style="padding-right: 14px!important">
+                            <div class="avatar">
+                               <p>
+                                  👤 {{ articles_like_count[i][6] }}
+                               </p>
+                               <p class="mb-0" style="color: #ccc;width: 256px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;font-size: 14px;">
+                                   <a href="{{ articles_like_count[i][5] }}" style="color: #ccc;">{{ articles_like_count[i][4] }}</a>
+                               </p>
+                            </div>
+                    <!--                        <div class="list-style-detail ml-3 mr-2">-->
+                    <!--                           -->
+                    <!--                        </div>-->
+                            <div class="list-style-action d-flex justify-content-end ml-auto">
+                               <h6 class="font-weight-bold text-danger">👍{{ articles_like_count[i][2] }}</h6>
+                            </div>
+                         </li>
+                        {% endfor %}
+                    {% endif %}
+               </ul>
+<!--               <div class="d-flex justify-content-end align-items-center border-top-table p-3">-->
+<!--                  <a href="" class="btn btn-secondary btn-sm">查看全部</a>-->
+<!--               </div>-->
+            </div>
+         </div>
+
+      </div>
+
+      {# 情感类型占比 #}
+      <div class="col-lg-4 col-md-6">
+         <div class="card card-block card-stretch card-height">
+            <div class="card-header d-flex justify-content-between">
+               <div class="header-title">
+                  <h4 class="card-title">情感类型占比</h4>
+               </div>
+               <div class="card-header-toolbar d-flex align-items-center">
+                  <div class="dropdown">
+
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-event">
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                 </svg>
+                                 Edit
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                 </svg>
+                                 View
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                 </svg>
+                                 Delete
+                           </a>
+                        </div>
+                     </div>
+               </div>
+            </div>
+            <div class="card-body p-0">
+               <div id="main_two" style="width: 100%; height: 350px;"></div>
+            </div>
+         </div>
+      </div>
+
+      {% if is_get_url != 1 %}
+          {# 微博类型占比 #}
+          <div class="col-lg-4 col-md-6">
+             <div class="card card-block card-stretch card-height">
+                <div class="card-header d-flex justify-content-between">
+                   <div class="header-title">
+                      <h4 class="card-title">微博类型汇总占比图（点赞数>5000）</h4>
+                   </div>
+                   <div class="card-header-toolbar d-flex align-items-center">
+                      <div class="dropdown">
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-event">
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                     </svg>
+                                     Edit
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                     </svg>
+                                     View
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                     </svg>
+                                     Delete
+                               </a>
+                            </div>
+                         </div>
+                   </div>
+                </div>
+                <div class="card-body p-0">
+                       <div id="main_three" style="width: 100%; height: 350px;">
+    <!--                       {% if is_get_url == 1 %}-->
+    <!--                            <img src="../../resources/static/image/wordCloud_unit.jpg" alt="" style="width: 370px; max-height: 350px;">-->
+    <!--                        {% else %}-->
+    <!--                            <img src="../../resources/static/image/wordCloud_all.jpg" alt="" style="width: 370px; max-height: 350px;">-->
+    <!--                        {% endif %}-->
+                       </div>
+                </div>
+             </div>
+          </div>
+
+          {# 微博发表时间占比 #}
+          <div class="col-lg-4 col-md-6">
+             <div class="card card-block card-stretch card-height">
+                <div class="card-header d-flex justify-content-between">
+                   <div class="header-title">
+                      <h4 class="card-title">微博发表时间占比</h4>
+                   </div>
+                   <div class="card-header-toolbar d-flex align-items-center">
+                      <div class="dropdown">
+
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-event">
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                     </svg>
+                                     Edit
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                     </svg>
+                                     View
+                               </a>
+                               <a class="dropdown-item" href="#">
+                                     <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                     </svg>
+                                     Delete
+                               </a>
+                            </div>
+                         </div>
+                   </div>
+                </div>
+                <div class="card-body p-0">
+                   <div id="main_four" style="width: 100%; height: 350px;"></div>
+                </div>
+             </div>
+          </div>
+      {% endif %}
+       <!--
+      <div class="col-lg-8 col-md-12">
+         <div class="card">
+            <div class="card-header d-flex justify-content-between">
+               <div class="header-title">
+                  <h4 class="card-title">New Customer</h4>
+               </div>
+               <div class="card-header-toolbar d-flex align-items-center">
+                  <div class="dropdown">
+                        <a href="#" class="text-muted pl-3" id="dropdownMenuButton-customer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false" style="-ms-transform: rotate(360deg); -webkit-transform: rotate(360deg); transform: rotate(360deg);" preserveaspectratio="xMidYMid meet" viewbox="0 0 24 24">
+                              <g fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                 <circle cx="12" cy="12" r="1"></circle>
+                                 <circle cx="19" cy="12" r="1"></circle>
+                                 <circle cx="5" cy="12" r="1"></circle></g>
+                           </svg>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-customer">
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                 </svg>
+                                 Edit
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                 </svg>
+                                 View
+                           </a>
+                           <a class="dropdown-item" href="#">
+                                 <svg class="svg-icon text-secondary" width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                 </svg>
+                                 Delete
+                           </a>
+                        </div>
+                     </div>
+               </div>
+            </div>
+            <div class="card-body p-0">
+               <div class="table-responsive">
+                  <table class="table mb-0">
+                     <thead class="table-color-heading">
+                        <tr class="text-secondary">
+                           <th scope="col">Date</th>
+                           <th scope="col">Customer</th>
+                           <th scope="col">Status</th>
+                           <th scope="col" class="text-right">Total</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr class="white-space-no-wrap">
+                           <td>01 Jun 2020</td>
+                           <td>
+                              <div class="d-flex align-items-center">
+                                 <div class="avatar-45 mr-2">
+                                    <img src="../../resources/static/picture/2.jpg" class="img-fluid rounded-circle" alt="image">
+                                 </div>
+                                 <div>Maggie Potts</div>
+                              </div>
+                           </td>
+                           <td>
+                              <p class="mb-0 text-success d-flex justify-content-start align-items-center">
+                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewbox="0 0 24 24" fill="none">
+                                 <circle cx="12" cy="12" r="8" fill="#3cb72c"></circle></svg>
+                                 </small> Completed
+                              </p>
+                           </td>
+                           <td class="text-right">$104.98</td>
+                        </tr>
+                        <tr class="white-space-no-wrap">
+                           <td>02 Jun 2020</td>
+                           <td>
+                              <div class="d-flex align-items-center">
+                                 <div class="avatar-45 mr-2">
+                                    <img src="../../resources/static/picture/5.jpg" class="img-fluid rounded-circle" alt="image">
+                                 </div>
+                                 <div>Kevin Adkins</div>
+                              </div>
+                           </td>
+                           <td>
+                              <p class="mb-0 text-success d-flex justify-content-start align-items-center">
+                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewbox="0 0 24 24" fill="none">
+                                 <circle cx="12" cy="12" r="8" fill="#3cb72c"></circle></svg>
+                                 </small> Completed
+                              </p>
+                           </td>
+                           <td class="text-right">$233.00</td>
+                        </tr>
+                        <tr class="white-space-no-wrap">
+                           <td>05 Jun 2020</td>
+                           <td>
+                              <div class="d-flex align-items-center">
+                                 <div class="avatar-45 mr-2">
+                                    <img src="../../resources/static/picture/1.jpg" class="img-fluid rounded-circle" alt="image">
+                                 </div>
+                                 <div>Max Lynn</div>
+                              </div>
+                           </td>
+                           <td>
+                              <p class="mb-0 text-warning d-flex justify-content-start align-items-center">
+                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewbox="0 0 24 24" fill="none">
+                                 <circle cx="12" cy="12" r="8" fill="#db7e06"></circle></svg>
+                                 </small>Pending
+                              </p>
+                           </td>
+                           <td class="text-right">$150.01</td>
+                        </tr>
+                        <tr class="white-space-no-wrap">
+                           <td>06 Jun 2020</td>
+                           <td>
+                              <div class="d-flex align-items-center">
+                                 <div class="avatar-45 mr-2">
+                                    <img src="../../resources/static/picture/3.jpg" class="img-fluid rounded-circle" alt="image">
+                                 </div>
+                                 <div>Danniw Yatt</div>
+                              </div>
+                           </td>
+                           <td>
+                              <p class="mb-0 text-danger d-flex justify-content-start align-items-center">
+                                 <small><svg class="mr-2" xmlns="http://www.w3.org/2000/svg" width="18" viewbox="0 0 24 24" fill="none">
+                                 <circle cx="12" cy="12" r="8" fill="#F42B3D"></circle></svg>
+                                 </small>Cancelled
+                              </p>
+                           </td>
+                           <td class="text-right">$199.99</td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <div class="d-flex justify-content-end align-items-center border-top-table p-3">
+                           <button class="btn btn-secondary btn-sm">See All</button>
+                        </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="col-lg-4 col-md-12">
+         <div class="card">
+            <div class="card-body">
+               <h4 class="font-weight-bold mb-3">City Orders Statistics</h4>
+               <div id="chart-map-column-04" class="custom-chart"></div>
+            </div>
+         </div>
+      </div>-->
+   </div>
+    <!-- Page end  -->
+</div>
+{% endblock %}
+
+
+
+
+{% block chart %}
+
+    {# 微博发布时间个数动态趋势图 #}
+    <script>
+
+        var chartDom = document.getElementById('main');
+        var myChart = echarts.init(chartDom);
+        var option;
+                    var date_count = {{ date_count|tojson }}
+                    var date_weibo_count = {{ date_weibo_count }}
+                    var xRes = []
+                    var yRes = []
+                    {# 将date_count和date_weibo_count转换成js数组 #}
+                    for(var i = 0; i < 8; i++){
+                        xRes.push(date_count[i])
+                        yRes.push(date_weibo_count[i])
+                    }
+
+        option = {
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+                    data: {{ date_count|tojson }}
+          },
+          yAxis: {
+            type: 'value'
+          },
+          series: [
+            {
+                    name:"日期",
+                    data: {{ date_weibo_count }},
+              type: 'line',
+              areaStyle: {
+                    color:"rgba(0, 128, 255, 0.2)"
+              },
+                    smooth:true,
+                    lineStyle:{
+                      width:5
+                    },
+                    emphasis:{
+                      focus:"series"
+                    }
+                    }
+          ],
+                    tooltip:{
+                        trigger:'axis'
+                    },
+                    legend: {
+                        top: '5%',
+                        left: 'center'
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                              dataZoom: {
+                                yAxisIndex: 'none'
+                              },
+                              dataView: { readOnly: false },
+                              magicType: { type: ['line', 'bar'] },
+                              restore: {},
+                              saveAsImage: {}
+                        }
+                    },
+        };
+                    {#  #}
+
+
+        option && myChart.setOption(option);
+
+                      function startInterval() {
+                          let count = 8;
+                          timer = setInterval(()=>{
+                              if(count >= date_count.length) count=0
+                              xRes.shift()
+                              xRes.push(date_count[count])
+                              yRes.shift()
+                              yRes.push(date_weibo_count[count])
+                              count++
+                              myChart.setOption({
+                              xAxis:[{
+                                  data:xRes
+                              }],
+                              series:[{
+                                  data:yRes
+                              }]
+                          })
+                          }, 2000);
+                      }
+
+                      startInterval();
+
+                      // 获取图表的 DOM 容器
+                      var chartContainer = document.getElementById('main');
+
+                      // 添加鼠标移入事件监听，使用事件捕获
+                      chartContainer.addEventListener('mouseover', function(event) {
+                          // 处理逻辑
+                          clearInterval(timer)
+
+                          console.log('鼠标移入容器', event);
+                      }, true); // true 表示在捕获阶段触发
+
+                      // 添加鼠标移出事件监听，使用事件捕获
+                      chartContainer.addEventListener('mouseout', function(event) {
+                          // 处理逻辑
+                          startInterval();
+                          console.log('鼠标移出容器', event);
+                      }, true); // true 表示在捕获阶段触发
+    </script>
+
+    {# 微博文章类型饼图 #}
+    <script>
+        var chartDom = document.getElementById('main_two');
+        var myChart_two = echarts.init(chartDom);
+        var option;
+
+        option = {
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            type: 'scroll',
+            top: '1%'
+          },
+          series: [
+            {
+              name: 'Access From',
+              type: 'pie',
+              radius: '50%',
+              data: {{ article_sentiments|tojson }},
+              emphasis: {
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+              }
+            }
+          ]
+        };
+
+        option && myChart_two.setOption(option);
+
+
+    </script>
+
+    {% if is_get_url != 1 %}
+        {# 大点赞数微博类型饼图 #}
+        <script>
+            var chartDom = document.getElementById('main_three');
+            var myChart_two = echarts.init(chartDom);
+            var option;
+
+            option = {
+              tooltip: {
+                trigger: 'item'
+              },
+              legend: {
+                type: 'scroll',
+                top: '1%'
+              },
+              series: [
+                {
+                  name: 'Access From',
+                  type: 'pie',
+                  radius: '50%',
+                  data: {{ article_type_count_gt_5000|tojson }},
+                  emphasis: {
+                    itemStyle: {
+                      shadowBlur: 10,
+                      shadowOffsetX: 0,
+                      shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                  }
+                }
+              ]
+            };
+
+            option && myChart_two.setOption(option);
+
+        </script>
+
+        {# 微博发布时间占比环图 #}
+    {% endif %}
+    <script>
+        var chartDom = document.getElementById('main_four');
+        var myChart_four = echarts.init(chartDom);
+        var option;
+
+        option = {
+          tooltip: {
+            trigger: 'item'
+          },
+          legend: {
+            type: 'scroll',
+            left: 'center'
+          },
+          series: [
+            {
+              name: '发表时间',
+              type: 'pie',
+              radius: ['60%', '50%'],
+              avoidLabelOverlap: false,
+              label: {
+                show: false,
+                position: 'center'
+              },
+              emphasis: {
+                label: {
+                  show: true,
+                  fontSize: 20,
+                  fontWeight: 'bold'
+                }
+              },
+              labelLine: {
+                show: false
+              },
+              data: {{ articles_date|tojson }}
+            }
+          ]
+        };
+
+        option && myChart_four.setOption(option);
+
+
+    </script>
+
+{% endblock %}
+
+

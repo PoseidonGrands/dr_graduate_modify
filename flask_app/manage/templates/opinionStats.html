@@ -1,0 +1,403 @@
+{% extends 'base_manage.html' %}
+
+{% block content %}
+    <div class="row" style="justify-content: center">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <div class="header-title">
+                        <h4 class="card-title">微博舆情统计</h4>
+                    </div>
+                    <div class="header-action">
+                        <i data-toggle="collapse" data-target="#datatable-2" aria-expanded="false">
+                            <svg width="20" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                 stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                            </svg>
+                        </i>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="collapse" id="datatable-2">
+                        <div class="card"><kbd class="bg-dark"><pre id="bootstrap-datatables-1"
+                                                                    class="text-white"><code>
+&lt;table id="datatable" class="table data-table table-striped table-bordered" &gt;
+&lt;thead&gt;
+   &lt;tr&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Position&lt;/th&gt;
+      &lt;th&gt;Office&lt;/th&gt;
+      &lt;th&gt;Age&lt;/th&gt;
+      &lt;th&gt;Start date&lt;/th&gt;
+      &lt;th&gt;Salary&lt;/th&gt;
+   &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Tiger Nixon&lt;/td&gt;
+      &lt;td&gt;System Architect&lt;/td&gt;
+      &lt;td&gt;Edinburgh&lt;/td&gt;
+      &lt;td&gt;61&lt;/td&gt;
+      &lt;td&gt;2011/04/25&lt;/td&gt;
+      &lt;td&gt;$320,800&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Garrett Winters&lt;/td&gt;
+      &lt;td&gt;Accountant&lt;/td&gt;
+      &lt;td&gt;Tokyo&lt;/td&gt;
+      &lt;td&gt;63&lt;/td&gt;
+      &lt;td&gt;2011/07/25&lt;/td&gt;
+      &lt;td&gt;$170,750&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Ashton Cox&lt;/td&gt;
+      &lt;td&gt;Junior Technical Author&lt;/td&gt;
+      &lt;td&gt;San Francisco&lt;/td&gt;
+      &lt;td&gt;66&lt;/td&gt;
+      &lt;td&gt;2009/01/12&lt;/td&gt;
+      &lt;td&gt;$86,000&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Cedric Kelly&lt;/td&gt;
+      &lt;td&gt;Senior Javascript Developer&lt;/td&gt;
+      &lt;td&gt;Edinburgh&lt;/td&gt;
+      &lt;td&gt;22&lt;/td&gt;
+      &lt;td&gt;2012/03/29&lt;/td&gt;
+      &lt;td&gt;$433,060&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Airi Satou&lt;/td&gt;
+      &lt;td&gt;Accountant&lt;/td&gt;
+      &lt;td&gt;Tokyo&lt;/td&gt;
+      &lt;td&gt;33&lt;/td&gt;
+      &lt;td&gt;2008/11/28&lt;/td&gt;
+      &lt;td&gt;$162,700&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Brielle Williamson&lt;/td&gt;
+      &lt;td&gt;Integration Specialist&lt;/td&gt;
+      &lt;td&gt;New York&lt;/td&gt;
+      &lt;td&gt;61&lt;/td&gt;
+      &lt;td&gt;2012/12/02&lt;/td&gt;
+      &lt;td&gt;$372,000&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Herrod Chandler&lt;/td&gt;
+      &lt;td&gt;Sales Assistant&lt;/td&gt;
+      &lt;td&gt;San Francisco&lt;/td&gt;
+      &lt;td&gt;59&lt;/td&gt;
+      &lt;td&gt;2012/08/06&lt;/td&gt;
+      &lt;td&gt;$137,500&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Rhona Davidson&lt;/td&gt;
+      &lt;td&gt;Integration Specialist&lt;/td&gt;
+      &lt;td&gt;Tokyo&lt;/td&gt;
+      &lt;td&gt;55&lt;/td&gt;
+      &lt;td&gt;2010/10/14&lt;/td&gt;
+      &lt;td&gt;$327,900&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Colleen Hurst&lt;/td&gt;
+      &lt;td&gt;Javascript Developer&lt;/td&gt;
+      &lt;td&gt;San Francisco&lt;/td&gt;
+      &lt;td&gt;39&lt;/td&gt;
+      &lt;td&gt;2009/09/15&lt;/td&gt;
+      &lt;td&gt;$205,500&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Sonya Frost&lt;/td&gt;
+      &lt;td&gt;Software Engineer&lt;/td&gt;
+      &lt;td&gt;Edinburgh&lt;/td&gt;
+      &lt;td&gt;23&lt;/td&gt;
+      &lt;td&gt;2008/12/13&lt;/td&gt;
+      &lt;td&gt;$103,600&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Jena Gaines&lt;/td&gt;
+      &lt;td&gt;Office Manager&lt;/td&gt;
+      &lt;td&gt;London&lt;/td&gt;
+      &lt;td&gt;30&lt;/td&gt;
+      &lt;td&gt;2008/12/19&lt;/td&gt;
+      &lt;td&gt;$90,560&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Quinn Flynn&lt;/td&gt;
+      &lt;td&gt;Support Lead&lt;/td&gt;
+      &lt;td&gt;Edinburgh&lt;/td&gt;
+      &lt;td&gt;22&lt;/td&gt;
+      &lt;td&gt;2013/03/03&lt;/td&gt;
+      &lt;td&gt;$342,000&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Charde Marshall&lt;/td&gt;
+      &lt;td&gt;Regional Director&lt;/td&gt;
+      &lt;td&gt;San Francisco&lt;/td&gt;
+      &lt;td&gt;36&lt;/td&gt;
+      &lt;td&gt;2008/10/16&lt;/td&gt;
+      &lt;td&gt;$470,600&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Haley Kennedy&lt;/td&gt;
+      &lt;td&gt;Senior Marketing Designer&lt;/td&gt;
+      &lt;td&gt;London&lt;/td&gt;
+      &lt;td&gt;43&lt;/td&gt;
+      &lt;td&gt;2012/12/18&lt;/td&gt;
+      &lt;td&gt;$313,500&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Tatyana Fitzpatrick&lt;/td&gt;
+      &lt;td&gt;Regional Director&lt;/td&gt;
+      &lt;td&gt;London&lt;/td&gt;
+      &lt;td&gt;19&lt;/td&gt;
+      &lt;td&gt;2010/03/17&lt;/td&gt;
+      &lt;td&gt;$385,750&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Michael Silva&lt;/td&gt;
+      &lt;td&gt;Marketing Designer&lt;/td&gt;
+      &lt;td&gt;London&lt;/td&gt;
+      &lt;td&gt;66&lt;/td&gt;
+      &lt;td&gt;2012/11/27&lt;/td&gt;
+      &lt;td&gt;$198,500&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Paul Byrd&lt;/td&gt;
+      &lt;td&gt;Chief Financial Officer (CFO)&lt;/td&gt;
+      &lt;td&gt;New York&lt;/td&gt;
+      &lt;td&gt;64&lt;/td&gt;
+      &lt;td&gt;2010/06/09&lt;/td&gt;
+      &lt;td&gt;$725,000&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Gloria Little&lt;/td&gt;
+      &lt;td&gt;Systems Administrator&lt;/td&gt;
+      &lt;td&gt;New York&lt;/td&gt;
+      &lt;td&gt;59&lt;/td&gt;
+      &lt;td&gt;2009/04/10&lt;/td&gt;
+      &lt;td&gt;$237,500&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Bradley Greer&lt;/td&gt;
+      &lt;td&gt;Software Engineer&lt;/td&gt;
+      &lt;td&gt;London&lt;/td&gt;
+      &lt;td&gt;41&lt;/td&gt;
+      &lt;td&gt;2012/10/13&lt;/td&gt;
+      &lt;td&gt;$132,000&lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Dai Rios&lt;/td&gt;
+      &lt;td&gt;Personnel Lead&lt;/td&gt;
+      &lt;td&gt;Edinburgh&lt;/td&gt;
+      &lt;td&gt;35&lt;/td&gt;
+      &lt;td&gt;2012/09/26&lt;/td&gt;
+      &lt;td&gt;$217,500&lt;/td&gt;
+   &lt;/tr&gt;
+&lt;/table&gt;
+                           </code></pre>
+                        </kbd>
+                        </div>
+                    </div>
+                    <p>微博舆情统计表格</p>
+                    <div class="table-responsive">
+                        <div id="datatable_wrapper" class="dataTables_wrapper dt-bootstrap4">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p><a href="http://127.0.0.1:8001/opinionStatistics/3?flag=True" class="btn btn-primary btn-sm">获取微博情感分类</a></p>
+                                    <table id="datatable"
+                                           class="table data-table table-striped table-bordered dataTable"
+                                           role="grid" aria-describedby="datatable_info">
+                                        <thead>
+                                            {% if is_get_url == 0 %}
+                                                <tr role="row">
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Name: activate to sort column ascending"
+                                                        style="width: 120px;">微博链接
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Position: activate to sort column ascending"
+                                                        style="width: 30px;">ip
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Office: activate to sort column ascending"
+                                                        style="width: 80px;">点赞量
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Age: activate to sort column ascending"
+                                                        style="width: 60px;">转发量
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Start date: activate to sort column ascending"
+                                                        style="width: 60px;">评论量
+                                                    </th>
+                                                    <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                        rowspan="1"
+                                                        colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                        style="width: 50px;">类型
+                                                    </th>
+                                                    <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                        rowspan="1"
+                                                        colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                        style="width: 350px;">内容
+                                                    </th>
+                                                    <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                        rowspan="1"
+                                                        colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                        style="width: 120px;">发布时间
+                                                    </th>
+                                                    {% if default_flag == True %}
+                                                        <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                            rowspan="1"
+                                                            colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                            style="width: 50px;">情感分类
+                                                        </th>
+                                                    {% endif %}
+                                                </tr>
+                                            {% else %}
+                                                <tr role="row">
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Position: activate to sort column ascending"
+                                                        style="width: 100px;">性别
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Position: activate to sort column ascending"
+                                                        style="width: 100px;">ip
+                                                    </th>
+                                                    <th class="sorting" tabindex="0" aria-controls="datatable" rowspan="1"
+                                                        colspan="1"
+                                                        aria-label="Office: activate to sort column ascending"
+                                                        style="width: 100px;">点赞量
+                                                    </th>
+                                                    <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                        rowspan="1"
+                                                        colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                        style="width: 550px;">内容
+                                                    </th>
+                                                    <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                        rowspan="1"
+                                                        colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                        style="width: 160px;">发布时间
+                                                    </th>
+                                                    {% if default_flag == True %}
+                                                        <th class="text-right sorting" tabindex="0" aria-controls="datatable"
+                                                            rowspan="1"
+                                                            colspan="1" aria-label="Salary: activate to sort column ascending"
+                                                            style="width: 50px;">情感分类
+                                                        </th>
+                                                    {% endif %}
+                                                </tr>
+                                            {% endif %}
+                                        </thead>
+                                        <tbody>
+                                            {% if is_get_url == 0 %}
+                                                {% for article in data %}
+                                                    <tr class="odd">
+                                                        <td>
+                                                            <a href="{{ article[5] }}">{{ article[0] }}</a>
+                                                        </td>
+                                                        <td>{{ article[3] }}</td>
+                                                        <td>{{ article[2] }}</td>
+                                                        <td>{{ article[8] }}</td>
+                                                        <td>{{ article[9] }}</td>
+                                                        <td class="text-right">{{ article[7] }}</td>
+                                                        <td class="text-right">{{ article[4] }}</td>
+                                                        <td class="text-right">{{ article[1] }}</td>
+                                                        {% if default_flag == True %}
+                                                            <td class="text-danger">
+                                                                {% if article[-1] == '正性' %}
+                                                                    <span class="text-success">{{ article[-1] }}</span>
+                                                                {% elif article[-1] == '负性' %}
+                                                                    <span class="text-danger">{{ article[-1] }}</span>
+                                                                {% endif %}
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endfor %}
+                                            {% else %}
+                                                {% for comment in data %}
+                                                    <tr class="odd">
+                                                        <td>{{ comment[7] }}</td>
+                                                        <td>{{ comment[4] }}</td>
+                                                        <td>{{ comment[3] }}</td>
+                                                        <td class="text-right">{{ comment[2] }}</td>
+                                                        <td class="text-right">{{ comment[5].strftime("%Y-%m-%d") }}</td>
+                                                        {% if default_flag == True %}
+                                                            <td class="text-danger">
+                                                                {% if comment[-1] == '正性' %}
+                                                                    <span class="text-success">{{ comment[-1] }}</span>
+                                                                {% elif comment[-1] == '负性' %}
+                                                                    <span class="text-danger">{{ comment[-1] }}</span>
+                                                                {% else %}
+                                                                    <span class="text-success">{{ comment[-1] }}</span>
+                                                                {% endif %}
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </tbody>
+                                        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                        <script>
+                                            $(document).ready(function() {
+                                                $('#datatable').DataTable({
+                                                    columnDefs: [
+                                                    {
+                                                        targets: [2],  // 需要自定义渲染的列的索引
+                                                        render: function(data, type, full, meta) {
+                                                            if (type === 'sort' || type === 'type') {
+                                                                // 在排序或类型检测时返回原始数据（去除👍符号）
+                                                                return data.replace('👍', '');
+                                                            }
+                                                            // 在显示时添加👍符号
+                                                            return '👍' + data;
+                                                            }
+                                                    },
+                                                    {
+                                                        targets: [3],  // 需要自定义渲染的列的索引（转发列）
+                                                        render: function(data, type, full, meta) {
+                                                            if (type === 'sort' || type === 'type') {
+                                                                return data.replace('📤', '');  // 去除📤符号
+                                                            }
+                                                            return '📤' + data;  // 显示📤符号
+                                                        }
+                                                    },
+                                                    {
+                                                        targets: [4],  // 需要自定义渲染的列的索引（评论列）
+                                                        render: function(data, type, full, meta) {
+                                                            if (type === 'sort' || type === 'type') {
+                                                                return data.replace('💬', '');  // 去除💬符号
+                                                            }
+                                                            return '💬' + data;  // 显示💬符号
+                                                        }
+                                                    }
+                                                    ]
+                                                });
+                                            });
+                                        </script>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block chart %}
+
+<script>
+
+</script>
+
+{% endblock %}
