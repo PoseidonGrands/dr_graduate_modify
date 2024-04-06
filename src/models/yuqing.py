@@ -22,13 +22,13 @@ def rateComments(article_id, is_cut=True):
         for index, comment in enumerate(comments):
             value = SnowNLP(comment[4]).sentiments
 
-            if value < 0.4:
+            if value < 0.45:
                 bad += 1
                 rateData.append([comment[4], '负性'])
-            elif value >= 0.4 and value <= 0.6:
+            elif value >= 0.45 and value <= 0.55:
                 middle += 1
                 rateData.append([comment[4], '中性'])
-            elif value > 0.6:
+            elif value > 0.55:
                 good += 1
                 rateData.append([comment[4], '正性'])
 
@@ -73,13 +73,13 @@ def rateComments(article_id, is_cut=True):
             query = "INSERT IGNORE INTO article_comments_sentiment (commentId, articleId, sentiment_score, sentiment_class) VALUES (%s, " \
                     "%s, %s, %s) "
 
-            if value < 0.4:
+            if value < 0.45:
                 bad += 1
                 values = (comment[0], article_id, value, '负性')
-            elif value >= 0.4 and value <= 0.6:
+            elif value >= 0.45 and value <= 0.55:
                 middle += 1
                 values = (comment[0], article_id, value, '中性')
-            elif value > 0.6:
+            elif value > 0.55:
                 good += 1
                 values = (comment[0], article_id, value, '正性')
 
@@ -103,6 +103,7 @@ def rateComments(article_id, is_cut=True):
 
 
 def rateArticles():
+    """统计爬取的全部文章情感分类数据"""
     targetFile = 'target_article.csv'
     articles = getAllArticles()
 

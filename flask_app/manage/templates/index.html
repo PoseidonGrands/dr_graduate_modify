@@ -481,15 +481,15 @@
         var chartDom = document.getElementById('main');
         var myChart = echarts.init(chartDom);
         var option;
-                    var date_count = {{ date_count|tojson }}
-                    var date_weibo_count = {{ date_weibo_count }}
-                    var xRes = []
-                    var yRes = []
-                    {# 将date_count和date_weibo_count转换成js数组 #}
-                    for(var i = 0; i < 8; i++){
-                        xRes.push(date_count[i])
-                        yRes.push(date_weibo_count[i])
-                    }
+        var date_count = {{ date_count|tojson }}
+        var date_weibo_count = {{ date_weibo_count }}
+        var xRes = []
+        var yRes = []
+        // 将date_count和date_weibo_count转换成js数组
+        for(var i = 0; i < 8; i++){
+            xRes.push(date_count[i])
+            yRes.push(date_weibo_count[i])
+        }
 
         option = {
           xAxis: {
@@ -537,7 +537,7 @@
                         }
                     },
         };
-                    {#  #}
+
 
 
         option && myChart.setOption(option);

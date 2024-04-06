@@ -482,14 +482,14 @@ def get_index_data(article_id):
         else:
             comments_date[date_str] += 1
 
-    print(like_count_max)
-    print(like_count_max_author)
-    print(citys_count)
-    print(comments_date)
+    # print(like_count_max)
+    # print(like_count_max_author)
+    # print(citys_count)
+    # print(comments_date)
 
     # 排序城市计数字典
     citys_count = list(sorted(citys_count.items(), key=lambda x: x[1], reverse=True))
-    print(citys_count)
+    # print(citys_count)
 
     # 获取评论点赞数并排序
     comments_like_count = list(sorted(comment_list, key=lambda x: int(x[3]), reverse=True))
@@ -497,11 +497,11 @@ def get_index_data(article_id):
 
     # 获取日期（用set去重
     date_count = list(set([comment[5].strftime("%Y-%m-%d") for comment in comment_list]))
-    print(date_count)
+    # print(date_count)
     # 将日期从小到大排序（根据时间戳
     date_count = list(
         sorted(date_count, key=lambda date: datetime.strptime(date, '%Y-%m-%d').timestamp(), reverse=True))
-    print(date_count)
+    # print(date_count)
 
     # 获取每个日期对应的微博数量
     '''
@@ -517,7 +517,7 @@ def get_index_data(article_id):
             if date == comment[5].strftime("%Y-%m-%d"):
                 date_weibo_count[index] += 1
 
-    print(date_count, date_weibo_count)
+    # print(date_count, date_weibo_count)
 
     # 修改微博发布日期的数据格式
     temp_comments_date = comments_date
@@ -528,12 +528,10 @@ def get_index_data(article_id):
             'value': value
         })
 
-    print(comments_date)
+    # print(comments_date)
 
     articles_type = getArticlesType()
-    print(articles_type)
-
-
+    # print(articles_type)
 
     # 提交事务
     conn.commit()

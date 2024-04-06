@@ -38,6 +38,9 @@ conn = connect_to_db()
 
 
 def save_to_db(query, data):
+    global conn
+    if conn is None:
+        connect_to_db()
     cursor = conn.cursor()
 
     cursor.execute(query, data)
@@ -164,9 +167,7 @@ def get_comments_data(data, article_id, current_max_id):
             save_to_db(insert_data_query, data)
     else:
         global is_change_ip
-        global is_sleep
         is_change_ip = True
-        is_sleep = True
         # 重新用代理尝试请求该页面的数据
         max_id_queue.put(current_max_id)
 

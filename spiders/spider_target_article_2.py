@@ -13,7 +13,6 @@ t = ThreadPoolExecutor(10)
 max_id_queue = Queue(maxsize=10)
 article_id = None
 proxies = []
-is_change_ip = False
 
 
 class ProxyException(Exception):
@@ -38,6 +37,9 @@ conn = connect_to_db()
 
 
 def save_to_db(query, data):
+    global conn
+    if conn is None:
+        connect_to_db()
     cursor = conn.cursor()
 
     cursor.execute(query, data)
@@ -82,6 +84,37 @@ def spider_article(headers, url, params):
         return articleId
 
 
+def get_comments_data(data, article_id):
+    """解析一页评论数据"""
+    comments = data['data']
+    max_id = str(data['max_id'])
+    if max_id != '0':
+        max_id_queue.put(max_id)
+    # 解析每条评论数据
+    print(f'评论数据有:{len(comments)}')
+    for comment in comments:
+        comment_id = comment['id']
+        # article_id = article_id
+        content = comment['text_raw']
+        like_counts = comment['like_counts']
+        # print(content)
+        try:
+            region = comment['source'].replace('来自', '')
+        except:
+            region = '无'
+        created_at = datetime.strptime(comment['created_at'], '%a %b %d %H:%M:%S %z %Y')
+        screen_name = comment['user']['screen_name']
+        authorGender = comment['user']['gender']
+
+        # 保存到数据库
+        insert_data_query = "INSERT IGNORE INTO article_comments (commentId, articleId, content, likeCounts, region, created_at, " \
+                            "screen_name, commenterGender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); "
+        data = (comment_id, article_id, content, like_counts, region, created_at, screen_name, authorGender)
+        # print(article_id)
+        save_to_db(insert_data_query, data)
+    return max_id
+
+
 def get_public_ip():
     """获取公网ip"""
     try:
@@ -93,11 +126,29 @@ def get_public_ip():
     except Exception as e:
         print("获取公网IP地址时出错:", e)
         return None
+    # try:
+    #     response = requests.get('https://api.ipify.org?format=json')
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         return data.get('ip')
+    #     else:
+    #
+    #         return None
+    #
+    # except Exception as e:
+    #     print("再次尝试获取...")
+    #     response = requests.get('https://httpbin.org/ip')
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         return data.get('origin')
+    #     else:
+    #         print("无法获取公网IP地址：", response.status_code)
+    #         return None
 
 
 def get_proxy():
     """获取静态代理IP"""
-    proxy = requests.get('http://static.pyhttp.taolop.com/get_static_ip?num=1&city=440300&type=2&port=2&lb=0&ts=0&cs=0&sb=')
+    proxy = requests.get('')
     res = proxy.json()['data']
     # print(res)
     global proxies
@@ -107,8 +158,7 @@ def get_proxy():
     print(proxies)
 
 
-def get_random_ip():
-    """当前只购买了一个静态代理，当有多个静态代理时才可随机使用"""
+def get_random_id():
     proxy = random.choice(proxies)
     return {'http': proxy, 'https': proxy}
 
@@ -116,59 +166,18 @@ def get_random_ip():
 def reset_white_list():
     # 代理申请白名单处理
     # 蜻蜓代理白名单处理
-    # current_ip = get_public_ip()
-    # print(current_ip)
-    # url = 'https://proxyapi.horocn.com/api/ip/whitelist'
-    # params = {
-    #     'token': '1cecb7591461c8187d39b262f39dad0e',
-    #     'ip': current_ip
-    # }
-    # res_del = requests.delete(url, params=params)
-    # res_put = requests.put(url, params=params)
-    # print(res_del.text)
-    # print(res_put.text)
-
     current_ip = get_public_ip()
-    requests.get(f'https://pycn.yapi.py.cn/index/index/save_white?neek=102560&appkey=36913bf638dd0952c7fe4a35bc715e3d&white={current_ip}')
+    print(current_ip)
+    url = 'https://proxyapi.horocn.com/api/ip/whitelist'
+    params = {
+        'token': '1cecb7591461c8187d39b262f39dad0e',
+        'ip': current_ip
+    }
+    res_del = requests.delete(url, params=params)
+    res_put = requests.put(url, params=params)
+    print(res_del.text)
+    print(res_put.text)
 
-
-def get_comments_data(data, article_id, current_max_id):
-    """解析一页评论数据"""
-    comments = data['data']
-    next_max_id = str(data['max_id'])
-    if next_max_id != '0':
-        max_id_queue.put(next_max_id)
-    # 解析每条评论数据
-    print(f'评论数据有:{len(comments)}')
-
-    if len(comments) != 0:
-        for comment in comments:
-            comment_id = comment['id']
-            # article_id = article_id
-            content = comment['text_raw']
-            like_counts = comment['like_counts']
-            # print(content)
-            try:
-                region = comment['source'].replace('来自', '')
-            except:
-                region = '无'
-            created_at = datetime.strptime(comment['created_at'], '%a %b %d %H:%M:%S %z %Y')
-            screen_name = comment['user']['screen_name']
-            authorGender = comment['user']['gender']
-
-            # 保存到数据库
-            insert_data_query = "INSERT IGNORE INTO article_comments (commentId, articleId, content, likeCounts, region, created_at, " \
-                                "screen_name, commenterGender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); "
-            data = (comment_id, article_id, content, like_counts, region, created_at, screen_name, authorGender)
-            # print(article_id)
-            save_to_db(insert_data_query, data)
-    else:
-        global is_change_ip
-        global is_sleep
-        is_change_ip = True
-        is_sleep = True
-        # 重新用代理尝试请求该页面的数据
-        max_id_queue.put(current_max_id)
 
 
 def spider_comments(headers, url):
@@ -183,40 +192,73 @@ def spider_comments(headers, url):
     id_list = []
 
     # 优先用本机公网地址访问（如果爬取到某个max_id的data长度为0，切换代理ip爬取
-    while 1:
-        # article_id为空则不获取评论数据
-        if article_id is None:
-            continue
 
-        comments_params['id'] = article_id
+    # 代理获取成功，用代理爬取
+    if len(proxies) != 0:
+        while 1:
+            # article_id为空则不获取评论数据
+            if article_id is None:
+                continue
 
-        # 检测是否需要切换到代理ip处理
-        if not is_change_ip:
-            resp = requests.get(url, headers=headers, params=comments_params)
-        else:
-            proxy = get_random_ip()
-            try:
-                resp = requests.get(url, headers=headers, params=comments_params, proxies=proxy, timeout=2)
-            except:
-                # 代理被封
-                break
-        if resp.status_code == 200:
-            data = resp.json()
-            # 用一个线程处理每页的数据解析
-            t.submit(get_comments_data, data, article_id, comments_params['max_id'])
+            comments_params['id'] = article_id
 
-            try:
-                # 循环爬取下一页，直到爬取的页面数据里max_id为0，代表是最后一页的数据
-                max_id = max_id_queue.get(timeout=3)
-                print(f"max_id is: {max_id}")
-                # 此max_id的数据已爬取
-                if max_id in id_list:
+            resp = None
+            for _ in range(0, len(proxies)):
+                proxy = get_random_id()
+                try:
+                    print(f'使用代理:{proxy}')
+                    resp = requests.get(url, headers=headers, params=comments_params, proxies=proxy, timeout=2)
+                    # 该ip请求成功了无需再次请求
                     break
-                comments_params['max_id'] = max_id
+                except Exception as e:
+                    print(e)
+                    continue
+
+            if resp is not None and resp.status_code == 200:
+                data = resp.json()
+                # 用一个线程处理每页的数据解析
+                t.submit(get_comments_data, data, article_id)
+
+                try:
+                    # 循环爬取下一页，直到爬取的页面数据里max_id为0，代表是最后一页的数据
+                    max_id = max_id_queue.get(timeout=3)
+                    print(f"max_id is: {max_id}")
+                    # 此max_id的数据已爬取
+                    if max_id in id_list:
+                        break
+                    comments_params['max_id'] = max_id
+                except TimeoutError:
+                    break
                 id_list.append(max_id)
-            except TimeoutError as e:
-                print(e)
-                break
+            else:
+                # 代理池的全部ip都无法获取到页面
+                raise ProxyException('the proxy pool unavailable...')
+    else:
+        # 代理获取失败，本机公网ip访问
+        while 1:
+            # article_id为空则不获取评论数据
+            if article_id is None:
+                continue
+
+            comments_params['id'] = article_id
+            resp = requests.get(url, headers=headers, params=comments_params)
+            if resp.status_code == 200:
+                data = resp.json()
+                # 用一个线程处理每页的数据解析
+                t.submit(get_comments_data, data, article_id)
+
+                try:
+                    # 循环爬取下一页，直到爬取的页面数据里max_id为0，代表是最后一页的数据
+                    max_id = max_id_queue.get(timeout=3)
+                    print(f"max_id is: {max_id}")
+                    # 此max_id的数据已爬取
+                    if max_id in id_list:
+                        break
+                    comments_params['max_id'] = max_id
+                    id_list.append(max_id)
+                except TimeoutError as e:
+                    print(e)
+                    break
 
 
 def spider(url):

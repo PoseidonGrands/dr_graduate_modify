@@ -224,7 +224,7 @@ def cut_comments_all(comments):
                           contour_width=1,  # 设置词云边框宽度 0是没有边框 一般用在指定形状的词云设置中
                           colormap=None,  # 设置组成词云的字体的颜色
                           color_func=None,  # 设置根据某种模式设置组成词云的字体颜色 比如根据图片的颜色对应设置词云颜色
-                          max_words=200,  # 设置最多显示多少个词 默认是200
+                          max_words=80,  # 设置最多显示多少个词 默认是200
                           max_font_size=80,  # 设置最大的字体字号
                           min_font_size=2,  # 设置最小的字体字号
                           scale=1  # 缩放比例 一般 1~4 即可 避免分辨率不够导致有些字太小看不清

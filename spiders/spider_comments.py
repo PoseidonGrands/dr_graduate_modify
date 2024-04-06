@@ -87,16 +87,23 @@ def init():
 def init_db():
     """数据库配置初始化"""
     global conn
+    # conn = pymysql.connect(
+    #     host='localhost',
+    #     port=3306,
+    #     user='root',
+    #     passwd='2280139492',
+    #     database='dr_weibo',
+    #     charset='utf8mb4'
+    # )
+
     conn = pymysql.connect(
         host='localhost',
         port=3306,
-        user='root',
-        passwd='2280139492',
+        user='dr',
+        passwd='3253532864',
         database='dr_weibo',
         charset='utf8mb4'
     )
-
-
 def save_to_db(query, data):
     cursor = conn.cursor()
 
