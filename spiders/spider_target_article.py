@@ -1,28 +1,14 @@
-import random
-import urllib.parse
-
-import requests
+import os, requests, csv
 import time
 import pymysql
 
+import numpy as np
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
-from queue import Queue
-
-t = ThreadPoolExecutor(10)
-max_id_queue = Queue(maxsize=10)
-article_id = None
-proxies = []
-is_change_ip = False
 
 
-class ProxyException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-
-def connect_to_db():
+def init():
     """数据库配置初始化"""
+    global conn
     conn = pymysql.connect(
         host='localhost',
         port=3306,
@@ -31,30 +17,48 @@ def connect_to_db():
         database='dr_weibo',
         charset='utf8mb4'
     )
-    return conn
-
-
-conn = connect_to_db()
 
 
 def save_to_db(query, data):
     cursor = conn.cursor()
-
     cursor.execute(query, data)
     conn.commit()
     cursor.close()
 
 
+def get_comments_data(data, article_id):
+    comments = data['data']
+    max_id = str(data['max_id'])
+    for comment in comments:
+        comment_id = comment['id']
+        article_id = article_id
+        content = comment['text_raw']
+        like_counts = comment['like_counts']
+        # print(content)
+        try:
+            region = comment['source'].replace('来自', '')
+        except:
+            region = '无'
+        created_at = datetime.strptime(comment['created_at'], '%a %b %d %H:%M:%S %z %Y')
+        screen_name = comment['user']['screen_name']
+        authorGender = comment['user']['gender']
+
+        # 保存到数据库
+        insert_data_query = "INSERT IGNORE INTO article_comments (commentId, articleId, content, likeCounts, region, created_at, " \
+                            "screen_name, commenterGender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); "
+        data = (comment_id, article_id, content, like_counts, region, created_at, screen_name, authorGender)
+        # print(article_id)
+        save_to_db(insert_data_query, data)
+    return max_id
+
+
 def spider_article(headers, url, params):
-    """将文章内容解析并入库，取出文章id用于请求评论数据"""
     resp = requests.get(url, headers=headers, params=params)
     # 数据获取成功，解析数据
     if resp.status_code == 200:
         data = resp.json()
         print("data is:", data)
         articleId = data['id']
-        global article_id
-        article_id = articleId
         created_at = datetime.strptime(data['created_at'], '%a %b %d %H:%M:%S %z %Y')
         attitudes_count = data['attitudes_count']
         try:
@@ -75,186 +79,77 @@ def spider_article(headers, url, params):
         # 保存到数据库
         insert_data_query = "INSERT IGNORE INTO article_content (articleId, created_at, attitudes_count, region, content, detail_url, screen_name, type, comments_count, reposts_count) " \
                             "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-        data = (articleId, created_at, attitudes_count, region, content, detailUrl, screen_name, type, commentsLen,
-                reposts_count)
+        data = (articleId, created_at, attitudes_count, region, content, detailUrl, screen_name, type, commentsLen, reposts_count)
         save_to_db(insert_data_query, (data))
 
         return articleId
 
 
-def get_public_ip():
-    """获取公网ip"""
-    try:
-        response = requests.get('http://myip.ipip.net/json')
-        if response.status_code == 200:
-            data = response.json()
-            if data['ret'] == 'ok':
-                return data['data']['ip']
-    except Exception as e:
-        print("获取公网IP地址时出错:", e)
-        return None
-
-
-def get_proxy():
-    """获取静态代理IP"""
-    proxy = requests.get('http://static.pyhttp.taolop.com/get_static_ip?num=1&city=440300&type=2&port=2&lb=0&ts=0&cs=0&sb=')
-    res = proxy.json()['data']
-    # print(res)
-    global proxies
-    for i in res:
-        # print(i)
-        proxies.append(f'{i["ip"]}:{i["port"]}')
-    print(proxies)
-
-
-def get_random_ip():
-    """当前只购买了一个静态代理，当有多个静态代理时才可随机使用"""
-    proxy = random.choice(proxies)
-    return {'http': proxy, 'https': proxy}
-
-
-def reset_white_list():
-    # 代理申请白名单处理
-    # 蜻蜓代理白名单处理
-    # current_ip = get_public_ip()
-    # print(current_ip)
-    # url = 'https://proxyapi.horocn.com/api/ip/whitelist'
-    # params = {
-    #     'token': '1cecb7591461c8187d39b262f39dad0e',
-    #     'ip': current_ip
-    # }
-    # res_del = requests.delete(url, params=params)
-    # res_put = requests.put(url, params=params)
-    # print(res_del.text)
-    # print(res_put.text)
-
-    current_ip = get_public_ip()
-    requests.get(f'https://pycn.yapi.py.cn/index/index/save_white?neek=102560&appkey=36913bf638dd0952c7fe4a35bc715e3d&white={current_ip}')
-
-
-def get_comments_data(data, article_id, current_max_id):
-    """解析一页评论数据"""
-    comments = data['data']
-    next_max_id = str(data['max_id'])
-    if next_max_id != '0':
-        max_id_queue.put(next_max_id)
-    # 解析每条评论数据
-    print(f'评论数据有:{len(comments)}')
-
-    if len(comments) != 0:
-        for comment in comments:
-            comment_id = comment['id']
-            # article_id = article_id
-            content = comment['text_raw']
-            like_counts = comment['like_counts']
-            # print(content)
-            try:
-                region = comment['source'].replace('来自', '')
-            except:
-                region = '无'
-            created_at = datetime.strptime(comment['created_at'], '%a %b %d %H:%M:%S %z %Y')
-            screen_name = comment['user']['screen_name']
-            authorGender = comment['user']['gender']
-
-            # 保存到数据库
-            insert_data_query = "INSERT IGNORE INTO article_comments (commentId, articleId, content, likeCounts, region, created_at, " \
-                                "screen_name, commenterGender) VALUES (%s, %s, %s, %s, %s, %s, %s, %s); "
-            data = (comment_id, article_id, content, like_counts, region, created_at, screen_name, authorGender)
-            # print(article_id)
-            save_to_db(insert_data_query, data)
-    else:
-        global is_change_ip
-        global is_sleep
-        is_change_ip = True
-        is_sleep = True
-        # 重新用代理尝试请求该页面的数据
-        max_id_queue.put(current_max_id)
-
-
-def spider_comments(headers, url):
+def spider_comments(headers, url, params):
     """只爬取评论，不爬取回复"""
-    comments_params = {
-        'id': '-1',
-        'is_show_bulletin': 2,
-        'max_id': 0
-    }
+    # 先爬取第一页评论，获取到max_id
+    resp = requests.get(url, headers=headers, params=params)
+    if resp.status_code == 200:
+        data = resp.json()
+        max_id = get_comments_data(data, params['id'])
+        # print(f"max_id is {max_id}")
 
-    # 存储id，确保不出现重复id
-    id_list = []
+        # 爬取下一页，知道爬取的页面数据里max_id为0，代表是最后一页数据
+        id_list = []
+        while True:
+            time.sleep(1)
+            # print('爬取中...')
+            params['max_id'] = max_id
 
-    # 优先用本机公网地址访问（如果爬取到某个max_id的data长度为0，切换代理ip爬取
-    while 1:
-        # article_id为空则不获取评论数据
-        if article_id is None:
-            continue
+            resp = requests.get(url, headers=headers, params=params)
+            if resp.status_code == 200:
+                data = resp.json()
+                max_id = get_comments_data(data, params['id'])
 
-        comments_params['id'] = article_id
-
-        # 检测是否需要切换到代理ip处理
-        if not is_change_ip:
-            resp = requests.get(url, headers=headers, params=comments_params)
-        else:
-            proxy = get_random_ip()
-            try:
-                resp = requests.get(url, headers=headers, params=comments_params, proxies=proxy, timeout=2)
-            except:
-                # 代理被封
-                break
-        if resp.status_code == 200:
-            data = resp.json()
-            # 用一个线程处理每页的数据解析
-            t.submit(get_comments_data, data, article_id, comments_params['max_id'])
-
-            try:
-                # 循环爬取下一页，直到爬取的页面数据里max_id为0，代表是最后一页的数据
-                max_id = max_id_queue.get(timeout=3)
-                print(f"max_id is: {max_id}")
-                # 此max_id的数据已爬取
-                if max_id in id_list:
+                print(max_id)
+                if max_id == "0" or (max_id in id_list):
                     break
-                comments_params['max_id'] = max_id
-                id_list.append(max_id)
-            except TimeoutError as e:
-                print(e)
-                break
 
+                id_list.append(max_id)
 
 def spider(url):
+    print('爬取微博：' + url)
+    init()
+
     # 取出文章内容的请求id
     start = url.rfind('/')
     end = url.rfind('?')
     weibo_id = url[start + 1:end]
-    print(f'爬取微博：{url}, id是：{weibo_id}' + url)
+    print(weibo_id)
 
-    # 代理设置
-    reset_white_list()
-    get_proxy()
+    headers = {
+        'Cookie': 'XSRF-TOKEN=Hf6ybqxmOhkajTWPaeoZpbKd; SUB=_2A25LEbmoDeRhGeFG7FQU9yrMwziIHXVobrNgrDV8PUNbmtAGLVLlkW9NeM_WpSnvZBDF497p9_SPK2qkbLDKxF4K; SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9W5M0en.mmgmPJzsu-lUgbTD5JpX5KzhUgL.FoMRS0qfS0B71hB2dJLoI7yE9gpDqfvRw5tt; ALF=02_1715295993; WBPSESS=rqOJvTwENBgHefuhw6Dmpw-DhEsc7AzZxVffDnsONVCxBqb-ON-yioO62vDsqFxoapLUeAgx6hgxo9VjrrX6Gwgq7iTHaRFqiPYFyjWSOuaYcVwehotHw84BkB-ygPU_35M0wQFei3vCrXXxNBbkaA==',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/118.0.0.0 Safari/537.36 '
+    }
 
     # 文章内容的请求url
     url_article = 'https://weibo.com/ajax/statuses/show'
     # 文章评论的请求url（多条
     url_comments = 'https://weibo.com/ajax/statuses/buildComments'
 
-    headers = {
-        'Cookie': 'SINAGLOBAL=5955062269649.503.1700546055600; SCF=Ao7LnEunhbZfNTxau6iJ-p-1P8z0uA3zTwJec__gQT7PpKHoogxooEvbaSzJnnCl-veA43F8nqe-Y8s11tpsh2U.; UOR=,,www.baidu.com; ULV=1711604782369:4:2:2:2981811308310.276.1711604782368:1711007405802; XSRF-TOKEN=1OoNAd9TKELpUymrKgLTqa3n; SUBP=0033WrSXqPxfM72wWs9jqgMF55529P9D9W5M0en.mmgmPJzsu-lUgbTD5JpVF02fe0-XSh24So2E; SUB=_2AkMRTbhrdcPxrARZn_4Qy2_iZIlH-jyimNGdAn7uJhMyAxh87lI_qSdutBF-XDq5BJf3e8M1AGbJ2bCm-oBci0RZ; WBPSESS=Dt2hbAUaXfkVprjyrAZT_LBr8_2tpTu-aBOLNGAqe6xJKJj5ECOq7GyUs8CJzYQqJkUQ0mLRbmw0UU3QqGmfbAEKrN4oQFOO_BK1M8zB9FTVsXXRjTLD8UZ5QIJtWqRe35usNF6J1KvocaW1hXzcPb_2zhJbWmuexWX1kEn8WHsxt13B8XNiV_NqyALHGHwL   ',
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/118.0.0.0 Safari/537.36 '
-    }
     article_params = {
         'id': weibo_id,
         'locale': 'zh-CN'
     }
 
-    # 爬取文章评论
-    future_spider_comment = t.submit(spider_comments, headers, url_comments)
-
     # 爬取文章内容
     try:
         article_id = spider_article(headers, url_article, article_params)
+
+        comments_params = {
+            'id': article_id,
+            'is_show_bulletin': 2
+        }
+        # 爬取文章评论
+        spider_comments(headers, url_comments, comments_params)
     finally:
         conn.close()
 
-    # 阻塞等待全部评论爬取完成
-    future_spider_comment.result()
     return article_id
 

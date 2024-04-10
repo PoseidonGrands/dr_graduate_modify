@@ -224,7 +224,7 @@ def articleAnalysis(item_id):
     scope_like_label = [f"0-{scope_likes[0]}"]
     [scope_like_label.append(f"{scope_likes[i]}-{scope_likes[i + 1]}") for i in range(0, 6)]
 
-    # 2.2、统计每个区间内的评论数量
+    # 1.2、统计每个区间内的评论数量
     counts_like = [0 for i in range(7)]
     # 遍历全部评论数
     for i in like_count:

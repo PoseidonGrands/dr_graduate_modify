@@ -92,7 +92,6 @@ def rateComments(article_id, is_cut=True):
         if is_cut:
             cutComments(comments)
 
-
         # 提交事务
         conn.commit()
 

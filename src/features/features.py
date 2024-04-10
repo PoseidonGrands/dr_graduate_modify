@@ -64,7 +64,7 @@ def cutComments(comments):
 
     # 2、去除停用词
     res = ''
-    stop_words = [line.strip() for line in open('/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/baidu_stopwords.txt', encoding='utf8').readlines()]
+    stop_words = [line.strip() for line in open('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/baidu_stopwords.txt', encoding='utf8').readlines()]
     custom_stop_words = ['http', 'cn']
 
     for word in cut:
@@ -73,7 +73,7 @@ def cutComments(comments):
             res += word
 
     # 3、再次分词、保存结果
-    with open('/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/cutWords_unit.txt', 'w', encoding='utf-8') as targetFile:
+    with open('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/cutWords_unit.txt', 'w', encoding='utf-8') as targetFile:
         # 全模式分词
         seg = jieba.cut(res, cut_all=True)
 
@@ -84,40 +84,51 @@ def cutComments(comments):
         print('写入完成')
 
     # 4、过滤
-    reader = open('/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/cutWords_unit.txt', 'r', encoding='utf8')
+    reader = open('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/cutWords_unit.txt', 'r', encoding='utf8')
     strs = reader.read()
-    result = open('/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/wordsCount_unit.txt', 'w', encoding='utf8')
+    result = open('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/wordsCount_unit.txt', 'w', encoding='utf8')
 
     # 此处再次分词只是为了能循环遍历每个词
     words = jieba.cut(strs, cut_all=True)
 
     new_words = []
+    del_words = ['t', 'http', 'cn', 'doge']
+    del_words_repeat_unit = ['哈', '啊']
     for word in words:
         # 去除数字、标点符号
         match_1 = re.search('\d+', word)
         match_2 = re.search('\W+', word)
 
         # 匹配成功返回match对象，否则返回None
-        if (not match_1) and (not match_2) and word != '' and len(word) > 1:
+        # if (not match_1) and (not match_2) and word != '' and len(word) > 1:
+        if (not match_1) and (not match_2) and word != '' and len(word) > 1 and word not in del_words and word[
+            0] not in del_words_repeat_unit:
             # 不包含标点符号或数字则保留
+            # print(f'过滤单词是：{word}')
             new_words.append(word)
+
 
     # 5、词频统计
     word_count = {}
     for i in new_words:
         word_count[i] = new_words.count(i)
+        print(i, new_words.count(i))
+    # print(f'过滤结果是：{word_count}')
 
     word_count_sorted = sorted(word_count.items(), key=lambda x: x[1], reverse=True)
     # 过滤词频为1的数据
     word_count_sorted = [item for item in word_count_sorted if item[1] > 1]
 
+    # print(f'过滤结果是：{word_count_sorted}')
+
     # 将词频统计结果写入文件
     for i in word_count_sorted:
+        # print(i)
         print(i, file=result)
 
     # 6、生成词云图
-    font_path = '/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/wendaoshouyuanti.ttf'
-    mask = np.array(Image.open('/Users/sewellhe/Py_Projects/ML/dr_graduate/src/features/weibo_wordcloud_bg_pixian_ai.png'))
+    font_path = '/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/wendaoshouyuanti.ttf'
+    mask = np.array(Image.open('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/features/weibo_wordcloud_bg_pixian_ai.png'))
     wordcloud = WordCloud(font_path=font_path,
                           background_color="white",
                           mask=mask,
@@ -128,7 +139,7 @@ def cutComments(comments):
                           contour_width=1,  # 设置词云边框宽度 0是没有边框 一般用在指定形状的词云设置中
                           colormap=None,  # 设置组成词云的字体的颜色
                           color_func=None,  # 设置根据某种模式设置组成词云的字体颜色 比如根据图片的颜色对应设置词云颜色
-                          max_words=200,  # 设置最多显示多少个词 默认是200
+                          max_words=80,  # 设置最多显示多少个词 默认是200
                           max_font_size=80,  # 设置最大的字体字号
                           min_font_size=2,  # 设置最小的字体字号
                           scale=1  # 缩放比例 一般 1~4 即可 避免分辨率不够导致有些字太小看不清
@@ -136,7 +147,7 @@ def cutComments(comments):
     data = ' '.join(new_words)
     wordcloud.generate(data)
     # wordcloud.to_file('src/features/wordCloud_unit.jpg')
-    wordcloud.to_file('/Users/sewellhe/Py_Projects/ML/dr_graduate/flask_app/resources/static/image/wordCloud_unit.jpg')
+    wordcloud.to_file('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/flask_app/resources/static/image/wordCloud_unit.jpg')
 
 
 def cut_comments_all(comments):
@@ -154,7 +165,6 @@ def cut_comments_all(comments):
         # print(word)
         if word not in stop_words and word not in custom_stop_words:
             res += word
-
 
 
     # 3、再次分词、保存结果
@@ -224,7 +234,7 @@ def cut_comments_all(comments):
                           contour_width=1,  # 设置词云边框宽度 0是没有边框 一般用在指定形状的词云设置中
                           colormap=None,  # 设置组成词云的字体的颜色
                           color_func=None,  # 设置根据某种模式设置组成词云的字体颜色 比如根据图片的颜色对应设置词云颜色
-                          max_words=80,  # 设置最多显示多少个词 默认是200
+                          max_words=50,  # 设置最多显示多少个词 默认是200
                           max_font_size=80,  # 设置最大的字体字号
                           min_font_size=2,  # 设置最小的字体字号
                           scale=1  # 缩放比例 一般 1~4 即可 避免分辨率不够导致有些字太小看不清
@@ -233,8 +243,6 @@ def cut_comments_all(comments):
     wordcloud.generate(data)
     wordcloud.to_file('../src/features/wordCloud_all.jpg')
     wordcloud.to_file('../flask_app/resources/static/image/wordCloud_all.jpg')
-
-
 
 
 if __name__ == '__main__':
@@ -249,6 +257,8 @@ if __name__ == '__main__':
     words = jieba.cut(strs, cut_all=True)
 
     new_words = []
+    del_words = ['t', 'http', 'cn', 'doge']
+    del_words_repeat_unit = ['哈', '啊']
 
     # 过滤
     for word in words:
@@ -257,7 +267,7 @@ if __name__ == '__main__':
         match_2 = re.search('\W+', word)
 
         # 匹配成功返回match对象，否则返回None
-        if (not match_1) and (not match_2) and word != '':
+        if (not match_1) and (not match_2) and word != '' and len(word) > 1 and word not in del_words and word[0] not in del_words_repeat_unit and word not in new_words:
             # 不包含标点符号或数字则保留
             new_words.append(word)
 
@@ -288,14 +298,14 @@ if __name__ == '__main__':
                           contour_width=1,  # 设置词云边框宽度 0是没有边框 一般用在指定形状的词云设置中
                           colormap=None,  # 设置组成词云的字体的颜色
                           color_func=None,  # 设置根据某种模式设置组成词云的字体颜色 比如根据图片的颜色对应设置词云颜色
-                          max_words=200,  # 设置最多显示多少个词 默认是200
+                          max_words=70,  # 设置最多显示多少个词 默认是200
                           max_font_size=80,  # 设置最大的字体字号
                           min_font_size=2,  # 设置最小的字体字号
                           scale=1  # 缩放比例 一般 1~4 即可 避免分辨率不够导致有些字太小看不清
                           )
     data = ' '.join(new_words)
     wordcloud.generate(data)
-    wordcloud.to_file('wordCloud.jpg')
+    wordcloud.to_file('/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/flask_app/resources/static/image/wordCloud_all.jpg')
 
     # print(strs)
 

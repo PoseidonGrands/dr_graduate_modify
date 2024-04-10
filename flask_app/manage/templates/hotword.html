@@ -347,6 +347,26 @@
 
 {% endblock %}
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#datatable').DataTable({
+            columnDefs: [
+            {
+                targets: [5],  // 需要自定义渲染的列的索引
+                render: function(data, type, full, meta) {
+                    if (type === 'sort' || type === 'type') {
+                        // 在排序或类型检测时返回原始数据（去除👍符号）
+                        return data.replace('👍', '');
+                    }
+                    // 在显示时添加👍符号
+                    return '👍' + data;
+                    }
+            }
+            ]
+        });
+    });
+</script>
 
 {% block chart %}
 <script>

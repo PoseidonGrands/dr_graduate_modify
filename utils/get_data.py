@@ -4,8 +4,8 @@ from datetime import datetime
 import pymysql
 from snownlp import SnowNLP
 
-relative_path = '/Users/sewellhe/Py_Projects/ML/dr_graduate/spiders/'
-relative_path_src = '/Users/sewellhe/Py_Projects/ML/dr_graduate/src/'
+relative_path = '/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/spiders/'
+relative_path_src = '/Users/sewellhe/Py_Projects/practice/dr_graduate_modify/src/'
 
 
 def init_db():
@@ -458,6 +458,7 @@ def get_index_data(article_id):
     cursor.execute(sql, (article_id,))
     result = cursor.fetchall()
     comments_count = result[0][0]
+    print(result[0])
     print(f'总评论个数有{comments_count}')
 
     # 3、遍历每条评论数据
@@ -1003,9 +1004,11 @@ def get_opinion_data(article_id):
     # print(negative)
 
     # 获取热词前10
+    print(f'读取路径是：{relative_path_src}/features/wordsCount_unit.txt')
     with open(relative_path_src + 'features/wordsCount_unit.txt', 'r', encoding='utf8') as f:
         words = f.readlines()
 
+    print(f'读取:{words}')
     hotwords = []
     hotwords_count = []
     for i in range(0, 10):
